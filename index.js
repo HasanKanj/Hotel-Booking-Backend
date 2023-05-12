@@ -6,6 +6,7 @@ import db from "./config/db.js";
 import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
 import userRoutes from './routes/userRoutes.js';
 import hotelRoutes from './routes/HotelRoutes.js'
+import roomRoutes from './routes/RoomRoute.js'
 import morgan from 'morgan';
 import { OAuth2Client } from 'google-auth-library';
 
@@ -24,7 +25,8 @@ app.use(express.json());
 
 // Set up routes
 app.use('/api/users', userRoutes)
-app.use('/api/hotel', hotelRoutes)
+app.use('/api/hotels', hotelRoutes)
+app.use('/api/rooms', roomRoutes)
 
 // Set up error handling middleware
 app.use(notFound);

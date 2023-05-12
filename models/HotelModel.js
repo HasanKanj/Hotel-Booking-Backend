@@ -2,10 +2,13 @@ import mongoose from "mongoose";
 
 const HotelSchema = new mongoose.Schema(
   {
- 
+    name: {
+      type: String,
+      required: true
+    },
     city: {
       type: String,
-      required: [true, "Please enter city"],
+      required: true,
     },
     address: {
       type: String,
@@ -26,11 +29,11 @@ const HotelSchema = new mongoose.Schema(
 
     category: {
       type: String,
-      required: [true, "Please enter  category"],
+      required: true
     },
     description: {
       type: String,
-      required: [true, "Please enter  description"],
+      required: true
     },
     rating: {
       type: Number,
@@ -41,14 +44,17 @@ const HotelSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    rooms:{
+     type:[String]
+    },
     price: {
       type: String,
-      required: [true, "Please enter  price"],
+      required: true,
       default: 0,
     },
     location: {
       type: String,
-      required: [true, "Please enter location"],
+      required: true,
     },
     featured: {
       type: Boolean,
@@ -56,7 +62,7 @@ const HotelSchema = new mongoose.Schema(
     },
     guests: {
       type: Number,
-      required: [true, "Please enter number of guests"],
+      required: true,
     },
     cheapestPrice: {
       type: Number,

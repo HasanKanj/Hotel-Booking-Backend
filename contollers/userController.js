@@ -120,18 +120,14 @@ const getUsers = asyncHandler(async (req, res) => {
 // @desc    Delete user
 // @route   DELETE /api/users/:id
 // @access  Private/Admin
-const deleteUser = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.params.id);
-
-  if (user) {
-    await user.remove();
-    res.json({ message: "User removed" });
-  } else {
-    res.status(404);
-    throw new Error("User not found");
+ const deleteUser = async (req,res,next)=>{
+  try {
+    await User.findByIdAndDelete(req.params.id);
+    res.status(200).json("User has been deleted.");
+  } catch (err) {
+    next(err);
   }
-});
-
+}
 // @desc    Get user by ID
 // @route   GET /api/users/:id
 // @access  Private/Admin
@@ -145,7 +141,6 @@ const getUserById = asyncHandler(async (req, res) => {
     throw new Error("User not found");
   }
 });
-
 // @desc    Update user
 // @route   PUT /api/users/:id
 // @access  Private/Admin
@@ -179,5 +174,5 @@ export {
   getUsers,
   deleteUser,
   getUserById,
-  updateUser,
+  updateUser
 };

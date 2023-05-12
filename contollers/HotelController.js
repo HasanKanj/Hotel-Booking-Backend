@@ -4,8 +4,8 @@ import cloudinary from "../utils/cloudinary.js";
 import multer from "multer";
 import Hotels from "../models/HotelModel.js";
 
-// @desc    Fetch all products
-// @route   GET /api/products
+// @desc    Fetch all Hotels
+// @route   GET /api/Hotels
 // @access  Public
 const getHotels = asyncHandler(async (req, res) => {
   const pageSize = 10;
@@ -21,15 +21,15 @@ const getHotels = asyncHandler(async (req, res) => {
     : {};
 
   const count = await Hotels.countDocuments({ ...keyword });
-  const products = await Hotels.find({ ...keyword })
+  const hotels = await Hotels.find({ ...keyword })
     .limit(pageSize)
     .skip(pageSize * (page - 1));
 
-  res.json({ products, page, pages: Math.ceil(count / pageSize) });
+  res.json({ hotels, page, pages: Math.ceil(count / pageSize) });
 });
 
 // @desc    Fetch single product
-// @route   GET /api/products/:id
+// @route   GET /api/hotels/:id
 // @access  Public
 const getHotelById = asyncHandler(async (req, res) => {
   const Hotel = await Hotels.findById(req.params.id);
@@ -84,6 +84,7 @@ const createHotel = asyncHandler(async (req, res) => {
       const result = await cloudinary.uploader.upload(req.file.path);
       // Create new Hotel
       let Hotel = new Hotels({
+        name:req.body.name,
         city: req.body.city,
         address: req.body.address,
         distance: req.body.distance,
@@ -122,6 +123,7 @@ const updateHotel = asyncHandler(async (req, res) => {
         res.status(500).json({ error: err.message });
       } else {
         const {
+          name,
           city,
           address,
           distance,
@@ -143,6 +145,7 @@ const updateHotel = asyncHandler(async (req, res) => {
         }
 
         // Update Hotel properties
+        Hotel.name = name || Hotel.name;
         Hotel.city = city || Hotel.city;
         Hotel.address = address || Hotel.address;
         Hotel.distance = distance || Hotel.distance;
@@ -181,7 +184,7 @@ const updateHotel = asyncHandler(async (req, res) => {
 });
 
 // @desc    Create new review
-// @route   POST /api/products/:id/reviews
+// @route   POST /api/hotels/:id/reviews
 // @access  Private
 const createHotelReview = asyncHandler(async (req, res) => {
   const { rating, comment } = req.body;
@@ -221,14 +224,50 @@ const createHotelReview = asyncHandler(async (req, res) => {
   }
 });
 
-// @desc    Get top rated products
-// @route   GET /api/products/top
+// @desc    Get top rated hotels
+// @route   GET /api/hotels/top
 // @access  Public
 const getTopHotels = asyncHandler(async (req, res) => {
-  const products = await Product.find({}).sort({ rating: -1 }).limit(3);
+  const hotels = await Product.find({}).sort({ rating: -1 }).limit(3);
 
-  res.json(products);
+  res.json(hotels);
 });
+
+ const countByCity = async (req, res, next) => {
+  const cities = req.query.cities.split(",");
+  try {
+    const list = await Promise.all(
+      cities.map((city) => {
+        return Hotels.countDocuments({ city: city });
+      })
+    );
+    res.status(200).json(list);
+  } catch (err) {
+    next(err);
+  }
+};
+
+
+ const countByType = async (req, res, next) => {
+  try {
+    const hotelCount = await Hotels.countDocuments({ type: "hotel" });
+    const apartmentCount = await Hotels.countDocuments({ type: "apartment" });
+    const resortCount = await Hotels.countDocuments({ type: "resort" });
+    const villaCount = await Hotels.countDocuments({ type: "villa" });
+    const cabinCount = await Hotels.countDocuments({ type: "cabin" });
+
+    res.status(200).json([
+      { type: "hotel", count: hotelCount },
+      { type: "apartments", count: apartmentCount },
+      { type: "resorts", count: resortCount },
+      { type: "villas", count: villaCount },
+      { type: "cabins", count: cabinCount },
+    ]);
+  } catch (err) {
+    next(err);
+  }
+};
+
 
 export {
   getHotels,
@@ -238,4 +277,6 @@ export {
   updateHotel,
   createHotelReview,
   getTopHotels,
+  countByCity,
+  countByType
 };
