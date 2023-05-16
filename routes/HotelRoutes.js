@@ -1,31 +1,38 @@
 import express from "express";
 import {
-  getHotels,
-  getHotelById,
-  deleteHotel,
-  createHotel,
-  updateHotel,
-  createHotelReview,
-  getTopHotels,
   countByCity,
-  countByType
+  countByType,
+  createHotel,
+  deleteHotel,
+  getHotel,
+  getHotelRooms,
+  getHotels,
+  updateHotel,
 } from "../contollers/HotelController.js";
-
 const router = express.Router();
 
-// Get all hotels and create a new hotel
-router.route("/").get(getHotels).post(createHotel);
+// : Create a new hotel
+router.post("/", createHotel);
 
-// Get a specific hotel by ID, update a specific hotel by ID, and delete a specific hotel by ID
-router.route("/:id").get(getHotelById).delete(deleteHotel).put(updateHotel);
+// Update an existing hotel by ID
+router.put("/:id", updateHotel);
 
-// Create a new review for a specific hotel by ID
-router.route("/:id/reviews").post(createHotelReview);
+// Delete an existing hotel by ID
+router.delete("/:id", deleteHotel);
 
-// Get a list of top-rated hotels
-router.get("/top", getTopHotels);
+//  Retrieve a specific hotel by ID
+router.get("/find/:id", getHotel);
 
+//  Retrieve all hotels
+router.get("/", getHotels);
+
+//  Retrieve the count of hotels by city
 router.get("/countByCity", countByCity);
+
+//  Retrieve the count of hotels by type
 router.get("/countByType", countByType);
+
+//  Retrieve all rooms for a specific hotel by ID
+router.get("/room/:id", getHotelRooms);
 
 export default router;

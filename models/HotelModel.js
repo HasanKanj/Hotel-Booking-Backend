@@ -27,10 +27,7 @@ const HotelSchema = new mongoose.Schema(
       required: true,
     },
 
-    category: {
-      type: String,
-      required: true
-    },
+
     description: {
       type: String,
       required: true
@@ -44,9 +41,10 @@ const HotelSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    rooms:{
-     type:[String]
-    },
+    rooms: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Room'
+    }],
     price: {
       type: String,
       required: true,

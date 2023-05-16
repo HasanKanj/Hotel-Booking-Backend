@@ -3,44 +3,34 @@ import upload from "../utils/multer.js"; // import the multer instance
 import cloudinary from "../utils/cloudinary.js";
 import multer from "multer";
 import Hotels from "../models/HotelModel.js";
-
+import Room from "../models/RoomModel.js";
 // @desc    Fetch all Hotels
 // @route   GET /api/Hotels
 // @access  Public
-const getHotels = asyncHandler(async (req, res) => {
-  const pageSize = 10;
-  const page = Number(req.query.pageNumber) || 1;
+const getHotels = async (req, res, next) => {
+  const { min, max, ...others } = req.query;
+  try {
+    const hotels = await Hotels.find({
+      ...others,
+      cheapestPrice: { $gt: min | 1, $lt: max || 999 },
+    }).limit(req.query.limit);
+    res.status(200).json(hotels);
+  } catch (err) {
+    next(err);
+  }
+};
 
-  const keyword = req.query.keyword
-    ? {
-        name: {
-          $regex: req.query.keyword,
-          $options: "i",
-        },
-      }
-    : {};
-
-  const count = await Hotels.countDocuments({ ...keyword });
-  const hotels = await Hotels.find({ ...keyword })
-    .limit(pageSize)
-    .skip(pageSize * (page - 1));
-
-  res.json({ hotels, page, pages: Math.ceil(count / pageSize) });
-});
-
-// @desc    Fetch single product
+// @desc    Fetch Hotel by city
 // @route   GET /api/hotels/:id
 // @access  Public
-const getHotelById = asyncHandler(async (req, res) => {
-  const Hotel = await Hotels.findById(req.params.id);
-
-  if (Hotel) {
-    res.json(Hotel);
-  } else {
-    res.status(404);
-    throw new Error("Product not found");
+const getHotel = async (req, res, next) => {
+  try {
+    const hotel = await Hotels.findById(req.params.id);
+    res.status(200).json(hotel);
+  } catch (err) {
+    next(err);
   }
-});
+};
 
 // @desc    Delete a Hotel
 // @route   DELETE /api/hotel/:id
@@ -64,7 +54,6 @@ const deleteHotel = asyncHandler(async (req, res) => {
   res.json({ message: "Car removed" });
 });
 
-
 const createHotel = asyncHandler(async (req, res) => {
   upload.single("image")(req, res, async function (err) {
     if (err instanceof multer.MulterError) {
@@ -84,7 +73,7 @@ const createHotel = asyncHandler(async (req, res) => {
       const result = await cloudinary.uploader.upload(req.file.path);
       // Create new Hotel
       let Hotel = new Hotels({
-        name:req.body.name,
+        name: req.body.name,
         city: req.body.city,
         address: req.body.address,
         distance: req.body.distance,
@@ -93,7 +82,6 @@ const createHotel = asyncHandler(async (req, res) => {
         price: req.body.price,
         features: req.body.features,
         description: req.body.description,
-        category: req.body.category,
         title: req.body.title,
         location: req.body.location,
         guests: req.body.guests,
@@ -101,7 +89,7 @@ const createHotel = asyncHandler(async (req, res) => {
         public_id: result.public_id,
         url: result.secure_url,
       });
-      
+
       // save Hotel details in mongodb
       await Hotel.save();
       res.status(200).json({ message: "Hotel created successfully!", Hotel });
@@ -129,13 +117,12 @@ const updateHotel = asyncHandler(async (req, res) => {
           distance,
           price,
           features,
-          category,
           rating,
           description,
           title,
           location,
           guests,
-          cheapestPrice
+          cheapestPrice,
         } = req.body;
         const Hotel = await Hotels.findById(req.params.id);
 
@@ -151,14 +138,12 @@ const updateHotel = asyncHandler(async (req, res) => {
         Hotel.distance = distance || Hotel.distance;
         Hotel.price = price || Hotel.price;
         Hotel.features = features || Hotel.features;
-        Hotel.category = category || Hotel.category;
         Hotel.rating = rating || Hotel.rating;
         Hotel.description = description || Hotel.description;
         Hotel.title = title || Hotel.title;
         Hotel.location = location || Hotel.location;
         Hotel.guests = guests || Hotel.guests;
         Hotel.cheapestPrice = cheapestPrice || Hotel.cheapestPrice;
-
 
         if (req.file) {
           // Delete old image from Cloudinary
@@ -233,7 +218,7 @@ const getTopHotels = asyncHandler(async (req, res) => {
   res.json(hotels);
 });
 
- const countByCity = async (req, res, next) => {
+const countByCity = async (req, res, next) => {
   const cities = req.query.cities.split(",");
   try {
     const list = await Promise.all(
@@ -247,8 +232,7 @@ const getTopHotels = asyncHandler(async (req, res) => {
   }
 };
 
-
- const countByType = async (req, res, next) => {
+const countByType = async (req, res, next) => {
   try {
     const hotelCount = await Hotels.countDocuments({ type: "hotel" });
     const apartmentCount = await Hotels.countDocuments({ type: "apartment" });
@@ -267,16 +251,28 @@ const getTopHotels = asyncHandler(async (req, res) => {
     next(err);
   }
 };
-
-
+const getHotelRooms = async (req, res, next) => {
+  try {
+    const hotel = await Hotels.findById(req.params.id);
+    const list = await Promise.all(
+      hotel.rooms.map((room) => {
+        return Room.findById(room);
+      })
+    );
+    res.status(200).json(list);
+  } catch (err) {
+    next(err);
+  }
+};
 export {
   getHotels,
-  getHotelById,
+  getHotel,
   deleteHotel,
   createHotel,
   updateHotel,
   createHotelReview,
   getTopHotels,
   countByCity,
-  countByType
+  countByType,
+  getHotelRooms,
 };
