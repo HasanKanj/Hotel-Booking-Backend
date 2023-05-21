@@ -1,11 +1,10 @@
-import mongoose from 'mongoose'
-import bcrypt from 'bcryptjs'
-
-const userSchema = mongoose.Schema(
+import mongoose from "mongoose";
+const UserSchema = new mongoose.Schema(
   {
-    name: {
+    username: {
       type: String,
       required: true,
+      unique: true,
     },
     email: {
       type: String,
@@ -20,34 +19,22 @@ const userSchema = mongoose.Schema(
         message: props => `\${props.value} is not a valid email address!`
       }
     },
+   
+  
+    phone: {
+      type: String,
+      required: true,
+    },
     password: {
       type: String,
       required: true,
     },
     isAdmin: {
       type: Boolean,
-      required: true,
       default: false,
     },
   },
-  {
-    timestamps: true,
-  }
-)
+  { timestamps: true }
+);
 
-userSchema.methods.matchPassword = async function (enteredPassword) {
-  return await bcrypt.compare(enteredPassword, this.password)
-}
-
-userSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) {
-    next()
-  }
-
-  const salt = await bcrypt.genSalt(10)
-  this.password = await bcrypt.hash(this.password, salt)
-})
-
-const User = mongoose.model('User', userSchema)
-
-export default User
+export default mongoose.model("User", UserSchema);
