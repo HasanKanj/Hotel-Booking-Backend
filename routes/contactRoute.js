@@ -11,8 +11,8 @@ const router = express.Router();
 // import { authenticateToken } from '../middleware/authMiddleware.js';
 
 router.post('/create', createContact);
-router.get('/getAll',getAllContacts);
-router.put('/update/:contactId',updateContactById);
+router.get('/',getAllContacts);
+router.put('/:id',updateContactById);
 router.delete('/delete/:contactId', deleteContactById);
 
 export default router;

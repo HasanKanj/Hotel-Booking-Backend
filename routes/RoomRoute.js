@@ -8,6 +8,7 @@ import {
   getRooms,
   updateRoom,
   updateRoomAvailability,
+  getRoomCount
 } from "../contollers/RoomController.js";
 import { protect, admin } from "../middleware/authMiddleware.js";
 
@@ -28,6 +29,10 @@ router.get("/:id", getRoom);
 
 // Get all rooms
 router.get("/", getRooms);
+
+// Get all count
+
+router.get("/count", getRoomCount);
 
 
 export default router;

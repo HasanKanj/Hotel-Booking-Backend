@@ -9,9 +9,12 @@ import Room from "../models/RoomModel.js";
 // @access  Public
 const getHotels = async (req, res, next) => {
   const { min, max, ...others } = req.query;
+  const { city } = others;
+  
   try {
     const hotels = await Hotels.find({
       ...others,
+      city: { $regex: new RegExp(city, "i") },
       cheapestPrice: { $gt: min | 1, $lt: max || 999 },
     }).limit(req.query.limit);
     res.status(200).json(hotels);
@@ -19,6 +22,7 @@ const getHotels = async (req, res, next) => {
     next(err);
   }
 };
+
 
 // @desc    Fetch Hotel by city
 // @route   GET /api/hotels/:id
@@ -42,16 +46,16 @@ const deleteHotel = asyncHandler(async (req, res) => {
   const hotel = await Hotels.findById(hotelid);
   if (!hotel) {
     res.status(404);
-    throw new Error("Car not found");
+    throw new Error("Hotel not found");
   }
 
   // Delete image from Cloudinary
   await cloudinary.uploader.destroy(hotel.public_id);
 
-  // Delete car from database
+  // Delete Hotel from database
   await Hotels.deleteOne({ _id: hotelid });
 
-  res.json({ message: "Car removed" });
+  res.json({ message: "Hotel removed" });
 });
 
 const createHotel = asyncHandler(async (req, res) => {
@@ -75,14 +79,14 @@ const createHotel = asyncHandler(async (req, res) => {
       let Hotel = new Hotels({
         name: req.body.name,
         city: req.body.city,
+        type: req.body.type,
+        rating:req.body.rating,
         address: req.body.address,
         distance: req.body.distance,
         features: req.body.features,
-        mileage: req.body.mileage,
         price: req.body.price,
         features: req.body.features,
         description: req.body.description,
-        title: req.body.title,
         location: req.body.location,
         guests: req.body.guests,
         cheapestPrice: req.body.cheapestPrice,
@@ -99,6 +103,7 @@ const createHotel = asyncHandler(async (req, res) => {
     }
   });
 });
+
 
 //@desc   Update a Hotel
 //@route  PUT /api/Hotels/:id
@@ -218,12 +223,14 @@ const getTopHotels = asyncHandler(async (req, res) => {
   res.json(hotels);
 });
 
+// Controller function for counting hotels by city
 const countByCity = async (req, res, next) => {
   const cities = req.query.cities.split(",");
+  
   try {
     const list = await Promise.all(
       cities.map((city) => {
-        return Hotels.countDocuments({ city: city });
+        return Hotels.countDocuments({ city: { $regex: new RegExp(city, "i") } });
       })
     );
     res.status(200).json(list);
@@ -232,7 +239,7 @@ const countByCity = async (req, res, next) => {
   }
 };
 
-const countByType = async (req, res, next) => {
+ const countByType = async (req, res, next) => {
   try {
     const hotelCount = await Hotels.countDocuments({ type: "hotel" });
     const apartmentCount = await Hotels.countDocuments({ type: "apartment" });
@@ -251,6 +258,9 @@ const countByType = async (req, res, next) => {
     next(err);
   }
 };
+
+
+
 const getHotelRooms = async (req, res, next) => {
   try {
     const hotel = await Hotels.findById(req.params.id);
@@ -264,6 +274,18 @@ const getHotelRooms = async (req, res, next) => {
     next(err);
   }
 };
+
+ const getHotelRoomCount = async (req, res, next) => {
+  try {
+    const hotel = await Hotels.findById(req.params.id);
+    const count = hotel.rooms.length;
+    res.status(200).json({ count });
+  } catch (err) {
+    next(err);
+  }
+};
+
+
 export {
   getHotels,
   getHotel,
@@ -275,4 +297,5 @@ export {
   countByCity,
   countByType,
   getHotelRooms,
+  getHotelRoomCount
 };

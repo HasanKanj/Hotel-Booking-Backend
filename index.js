@@ -24,7 +24,7 @@ mongoose.connect(process.env.MONGO_URL);
 await db();
 
 // Set up middleware
-app.use(cors({ credentials: true, origin: "http://localhost:5173" }));
+app.use(cors({ credentials: true, origin: "http://localhost:3000" }));
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser())
 app.use(express.json());

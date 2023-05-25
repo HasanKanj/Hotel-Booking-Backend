@@ -36,3 +36,12 @@ export const getUsers = async (req,res,next)=>{
     next(err);
   }
 }
+
+export const CountUsers = async (req, res, next) => {
+  try {
+    const count = await User.countDocuments();
+    res.status(200).json({ count });
+  } catch (err) {
+    next(err);
+  }
+};

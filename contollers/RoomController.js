@@ -79,6 +79,7 @@ import Hotels from "../models/HotelModel.js";
   try {
     const room = await Room.findById(req.params.id);
     res.status(200).json(room);
+    console.log(room)
   } catch (err) {
     next(err);
   }
@@ -93,11 +94,21 @@ import Hotels from "../models/HotelModel.js";
   }
 };
 
+ const getRoomCount = async (req, res, next) => {
+  try {
+    const count = await Room.countDocuments();
+    res.status(200).json({ count });
+  } catch (err) {
+    next(err);
+  }
+};
+
 export {
     getRooms,
     getRoom,
     updateRoomAvailability,
     deleteRoom,
     createRoom,
-    updateRoom
+    updateRoom,
+    getRoomCount
   };

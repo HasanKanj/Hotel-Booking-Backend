@@ -8,6 +8,7 @@ import {
   getHotelRooms,
   getHotels,
   updateHotel,
+  getHotelRoomCount
 } from "../contollers/HotelController.js";
 const router = express.Router();
 
@@ -26,6 +27,9 @@ router.get("/find/:id", getHotel);
 //  Retrieve all hotels
 router.get("/", getHotels);
 
+//  Retrieve all hotels
+router.get("/count", getHotelRoomCount);
+
 //  Retrieve the count of hotels by city
 router.get("/countByCity", countByCity);
 
@@ -34,5 +38,7 @@ router.get("/countByType", countByType);
 
 //  Retrieve all rooms for a specific hotel by ID
 router.get("/room/:id", getHotelRooms);
+
+
 
 export default router;

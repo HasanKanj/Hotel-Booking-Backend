@@ -10,6 +10,10 @@ const HotelSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    type: {
+      type: String,
+      required: true,
+    },
     address: {
       type: String,
       required: true,
@@ -37,31 +41,17 @@ const HotelSchema = new mongoose.Schema(
       min: 0,
       max: 5,
     },
-    title: {
-      type: String,
-      required: true,
-    },
+
     rooms: [{
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Room'
     }],
-    price: {
-      type: String,
-      required: true,
-      default: 0,
-    },
-    location: {
-      type: String,
-      required: true,
-    },
+  
     featured: {
       type: Boolean,
       default: false,
     },
-    guests: {
-      type: Number,
-      required: true,
-    },
+  
     cheapestPrice: {
       type: Number,
       required: true,
@@ -72,6 +62,10 @@ const HotelSchema = new mongoose.Schema(
   }
 );
 
+// Update the Hotels model to include a static method for case-insensitive search
+HotelSchema.statics.findByCity = function(city) {
+  return this.find({ city: { $regex: new RegExp(city, "i") } });
+};
 const Hotels = mongoose.model("Hotels", HotelSchema);
 
 export default Hotels;

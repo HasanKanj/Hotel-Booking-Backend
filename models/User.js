@@ -11,19 +11,21 @@ const UserSchema = new mongoose.Schema(
       required: true,
       unique: true,
       validate: {
-        validator: function(email) {
+        validator: function (email) {
           // Regular expression to check email format
           const re = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
           return re.test(email);
         },
-        message: props => `\${props.value} is not a valid email address!`
-      }
+        message: (props) => `\${props.value} is not a valid email address!`,
+      },
     },
-   
-  
+
     phone: {
-      type: String,
+      type: Number,
       required: true,
+    },
+    img: {
+      type: String,
     },
     password: {
       type: String,
@@ -31,7 +33,7 @@ const UserSchema = new mongoose.Schema(
     },
     isAdmin: {
       type: Boolean,
-      default: false,
+      default: true,
     },
   },
   { timestamps: true }
