@@ -11,15 +11,19 @@ import {
   getRoomCount
 } from "../contollers/RoomController.js";
 import { protect, admin } from "../middleware/authMiddleware.js";
+import { verifyAdmin, verifyToken, verifyUser } from "../utils/verifyToken.js";
 
 // Create a room for a hotel
-router.post("/:hotelid", createRoom);
+router.post("/:hotelid",protect, createRoom);
+
+// Get all count
+router.get("/count", getRoomCount);
 
 // Update room availability for a specific room by ID
 router.put("/availability/:id", updateRoomAvailability);
 
 // Update a specific room by ID
-router.put("/:id", admin, updateRoom);
+router.put("/:id", updateRoom);
 
 // Delete a specific room by ID and hotel ID
 router.delete("/:id/:hotelid", deleteRoom);
@@ -30,9 +34,7 @@ router.get("/:id", getRoom);
 // Get all rooms
 router.get("/", getRooms);
 
-// Get all count
 
-router.get("/count", getRoomCount);
 
 
 export default router;

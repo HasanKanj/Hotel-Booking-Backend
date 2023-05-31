@@ -6,24 +6,22 @@ import {
   getUsers,
   CountUsers
 } from "../contollers/user.js";
-import { verifyAdmin, verifyToken, verifyUser } from "../utils/verifyToken.js";
 
 const router = express.Router();
 
-//UPDATE
-router.put("/:id", updateUser);
-
-//DELETE
-router.delete("/:id", deleteUser);
-
-//GET
-router.get("/:id", verifyUser, getUser);
-
-//GET ALL
-router.get("/", getUsers);
-
-//count users
+// Count users
 router.get("/count", CountUsers);
 
+// Update user
+router.put("/:id", updateUser);
+
+// Delete user
+router.delete("/:id", deleteUser);
+
+// Get user
+router.get("/:id", getUser);
+
+// Get all users
+router.get("/", getUsers);
 
 export default router;

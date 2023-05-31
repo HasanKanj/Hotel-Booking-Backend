@@ -259,7 +259,14 @@ const countByCity = async (req, res, next) => {
   }
 };
 
-
+const countAllHotels = async (req, res, next) => {
+  try {
+    const hotelCount = await Hotels.countDocuments();
+    res.status(200).json({ count: hotelCount });
+  } catch (err) {
+    next(err);
+  }
+};
 
 const getHotelRooms = async (req, res, next) => {
   try {
@@ -275,15 +282,7 @@ const getHotelRooms = async (req, res, next) => {
   }
 };
 
- const getHotelRoomCount = async (req, res, next) => {
-  try {
-    const hotel = await Hotels.findById(req.params.id);
-    const count = hotel.rooms.length;
-    res.status(200).json({ count });
-  } catch (err) {
-    next(err);
-  }
-};
+
 
 
 export {
@@ -297,5 +296,5 @@ export {
   countByCity,
   countByType,
   getHotelRooms,
-  getHotelRoomCount
+  countAllHotels
 };

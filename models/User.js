@@ -24,16 +24,14 @@ const UserSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    img: {
-      type: String,
-    },
+  
     password: {
       type: String,
       required: true,
     },
     isAdmin: {
       type: Boolean,
-      default: true,
+      default: false,
     },
   },
   { timestamps: true }
